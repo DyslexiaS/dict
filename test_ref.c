@@ -37,13 +37,14 @@ int main(int argc, char **argv)
     char *sgl[LMAX] = {NULL};
     tst_node *root = NULL, *res = NULL;
     int rtn = 0, idx = 0, sidx = 0;
-    FILE *fp = fopen(IN_FILE, "r");
     double t1, t2;
 
+    FILE *fp = fopen(IN_FILE, "r");
     if (!fp) { /* prompt, open, validate file for reading */
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
         return 1;
     }
+
     t1 = tvgetf();
 
     bloom_t bloom = bloom_create(TableSize);
@@ -52,9 +53,8 @@ int main(int argc, char **argv)
     char *pool = (char *) malloc(poolsize * sizeof(char));
     char *Top = pool;
     while ((rtn = fscanf(fp, "%s", Top)) != EOF) {
-        char *p = Top;
         /* insert reference to each string */
-        if (!tst_ins_del(&root, &p, INS, REF)) { /* fail to insert */
+        if (!tst_ins_del(&root, Top, INS, REF)) { /* fail to insert */
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
             return 1;
@@ -69,7 +69,6 @@ int main(int argc, char **argv)
     printf("ternary_tree, loaded %d words in %.6f sec\n", idx, t2 - t1);
 
     for (;;) {
-        char *p;
         printf(
             "\nCommands:\n"
             " a  add word to the tree\n"
@@ -84,7 +83,6 @@ int main(int argc, char **argv)
         else
             fgets(word, sizeof word, stdin);
 
-        p = NULL;
         switch (*word) {
         case 'a':
             printf("enter word to add: ");
@@ -97,13 +95,12 @@ int main(int argc, char **argv)
             }
             rmcrlf(Top);
 
-            p = Top;
             t1 = tvgetf();
             if (bloom_test(bloom, Top) == 1) /* if detected by filter, skip */
                 res = NULL;
             else { /* update via tree traversal and bloom filter */
                 bloom_add(bloom, Top);
-                res = tst_ins_del(&root, &p, INS, REF);
+                res = tst_ins_del(&root, Top, INS, REF);
             }
             t2 = tvgetf();
             if (res) {
@@ -177,11 +174,10 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = word;
             printf("  deleting %s\n", word);
             t1 = tvgetf();
             /* FIXME: remove reference to each string */
-            res = tst_ins_del(&root, &p, DEL, REF);
+            res = tst_ins_del(&root, word, DEL, REF);
             t2 = tvgetf();
             if (res)
                 printf("  delete failed.\n");

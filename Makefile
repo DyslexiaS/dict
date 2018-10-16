@@ -4,7 +4,7 @@ TEST_DATA = s Tai
 
 CFLAGS = -O0 -Wall -Werror -g
 
-# Control the build verbosity                                                   
+# Control the build verbosity
 ifeq ("$(VERBOSE)","1")
     Q :=
     VECHO = @true

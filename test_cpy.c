@@ -31,8 +31,6 @@ int main(int argc, char **argv)
     double t1, t2;
 
     FILE *fp = fopen(IN_FILE, "r");
-
-
     if (!fp) { /* prompt, open, validate file for reading */
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
         return 1;
@@ -40,8 +38,7 @@ int main(int argc, char **argv)
 
     t1 = tvgetf();
     while ((rtn = fscanf(fp, "%s", word)) != EOF) {
-        char *p = word;
-        if (!tst_ins_del(&root, &p, INS, CPY)) {
+        if (!tst_ins_del(&root, word, INS, CPY)) {
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
             return 1;
@@ -68,7 +65,6 @@ int main(int argc, char **argv)
         printf("open file error\n");
 
     for (;;) {
-        char *p;
         printf(
             "\nCommands:\n"
             " a  add word to the tree\n"
@@ -83,7 +79,6 @@ int main(int argc, char **argv)
         else
             fgets(word, sizeof word, stdin);
 
-        p = NULL;
         switch (*word) {
         case 'a':
             printf("enter word to add: ");
@@ -94,9 +89,8 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = word;
             t1 = tvgetf();
-            res = tst_ins_del(&root, &p, INS, CPY);
+            res = tst_ins_del(&root, word, INS, CPY);
             t2 = tvgetf();
             if (res) {
                 idx++;
@@ -154,10 +148,9 @@ int main(int argc, char **argv)
                 break;
             }
             rmcrlf(word);
-            p = word;
             printf("  deleting %s\n", word);
             t1 = tvgetf();
-            res = tst_ins_del(&root, &p, DEL, CPY);
+            res = tst_ins_del(&root, word, DEL, CPY);
             t2 = tvgetf();
             if (res)
                 printf("  delete failed.\n");
