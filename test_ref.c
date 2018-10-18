@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
     if (argc == 2 && strcmp(argv[1], "--bench") == 0) {
         int stat = bench_test(root, BENCH_TEST_FILE, LMAX);
-        tst_free_all(root);
+        tst_free(root);
         return stat;
     }
 
@@ -100,7 +100,6 @@ int main(int argc, char **argv)
         switch (*word) {
         case 'a':
             printf("enter word to add: ");
-            fflush(stdout);
             if (argc > 1 && strcmp(argv[1], "--bench") == 0)
                 strcpy(Top, argv[3]);
 
