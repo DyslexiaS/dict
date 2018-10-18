@@ -50,6 +50,15 @@ test:  $(TESTS)
                 -e cache-misses,cache-references,instructions,cycles \
 		./test_ref --bench $(TEST_DATA)
 
+bench_perf:  $(TESTS)
+	echo 3 | sudo tee /proc/sys/vm/drop_caches;
+	perf stat \
+                -e cache-misses,cache-references,instructions,cycles \
+                ./test_cpy --bench
+	perf stat \
+                -e cache-misses,cache-references,instructions,cycles \
+		./test_ref --bench
+
 bench: $(TESTS)
 	@for test in $(TESTS); do\
 		./$$test --bench $(TEST_DATA); \
